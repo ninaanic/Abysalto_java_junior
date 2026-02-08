@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Order Management Subsystem</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Order Management Subsystem</h1>
+    <hr>
+    <h2>Add new order</h2>
+
+    <form id="orderForm" th:action="@{/order/save}" th:object="${order}" method="POST">
+      <!-- Buyer -->
+      <select th:field="*{buyerId}" class="form-control mb-3 col-4" required>
+        <option value="" disabled selected>Select Buyer</option>
+        <option th:each="buyer : ${buyers}" th:value="${buyer.buyerId}"
+          th:text="${buyer.firstName + ' ' + buyer.lastName}"></option>
+      </select>
+      <!-- Order Status -->
+      <select th:field="*{orderStatus}" class="form-control mb-3 col-4" required>
+        <option value="" disabled selected>Select Status</option>
+        <option th:each="status : ${orderStatuses}" th:value="${status}" th:text="${status}"></option>
+      </select>
+      <!-- Order Time -->
+      <input type="datetime-local" th:field="*{orderTime}" placeholder="Order Time" class="form-control mb-3 col-4">
+      <!-- Payment Option -->
+      <select th:field="*{paymentOption}" class="form-control mb-3 col-4" required>
+        <option value="" disabled selected>Select Payment Option</option>
+        <option th:each="option : ${paymentOptions}" th:value="${option}" th:text="${option}"></option>
+      </select>
+      <!-- Buyer Address (input fields) -->
+      <div class="form-row mb-3">
+        <div class="col">
+          <input type="text" name="addressCity" placeholder="City" class="form-control" required>
+        </div>
+        <div class="col">
+          <input type="text" name="addressStreet" placeholder="Street" class="form-control" required>
+        </div>
+        <div class="col">
+          <input type="text" name="addressHomeNumber" placeholder="Home Number" class="form-control">
+        </div>
+      </div>
+      <input type="text" th:field="*{contactNumber}" placeholder="Contact Number" class="form-control mb-3 col-4">
+      <!-- Order Items -->
+      <h4>Order Items</h4>
+      <div id="orderItemsContainer">
+        <div th:each="item, iterStat : *{orderItems}" class="order-item-row">
+          <select th:field="*{orderItems[__${iterStat.index}__].itemId}" class="form-control mb-2 item-select" required>
+            <option value="" disabled selected>Select Item</option>
+            <option th:each="item : ${items}" th:value="${item.itemId}" th:text="${item.name}"></option>
+          </select>
+          <input type="number" th:field="*{orderItems[__${iterStat.index}__].quantity}" placeholder="Quantity"
+            class="form-control mb-2 item-quantity" min="1" required>
+          <button type="button" class="btn btn-danger mb-2 remove-item-btn" onclick="removeItem(this)">Remove</button>
+          <hr>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary mb-3" onclick="addOrderItem()">Add Item</button>
+      <!-- Total price (hide) -->
+      <div class="mb-3">
+        <input type="hidden" th:field="*{totalPrice}" id="totalPrice">
+      </div>
+      <button type="submit" class="btn btn-info col-2">Save Order</button>
+    </form>
+    <hr>
+    <a th:href="@{/order/}">Back to list of orders</a>
+  </div>
+
+  <script>
+    function addOrderItem() {
+      const container = document.getElementById('orderItemsContainer');
+      const rows = container.getElementsByClassName('order-item-row');
+      if (rows.length === 0) return;
+      const newRow = rows[0].cloneNode(true);
+
+      // Clear input values in the cloned row
+      newRow.querySelectorAll('select, input').forEach(input => {
+        if (input.type === 'number') input.value = '';
+        else if (input.tagName === 'SELECT') input.selectedIndex = 0;
+      });
+      container.appendChild(newRow);
+      updateIndexes();
+    }
+
+    function removeItem(btn) {
+      const container = document.getElementById('orderItemsContainer');
+      if (container.getElementsByClassName('order-item-row').length > 1) {
+        btn.closest('.order-item-row').remove();
+        updateIndexes();
+      }
+    }
+
+    function updateIndexes() {
+      const rows = document.querySelectorAll('.order-item-row');
+      rows.forEach((row, idx) => {
+        row.querySelectorAll('select, input').forEach(input => {
+          if (input.name) {
+            input.name = input.name.replace(/orderItems\[\d+\]/, 'orderItems[' + idx + ']');
+          }
+          if (input.id) {
+            input.id = input.id.replace(/orderItems_\d+_/, 'orderItems_' + idx + '_');
+          }
+        });
+      });
+    }
+  </script>
+</body>
+
+</html>
