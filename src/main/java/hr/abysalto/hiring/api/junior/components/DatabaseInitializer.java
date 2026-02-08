@@ -42,33 +42,42 @@ public class DatabaseInitializer {
 
 		this.jdbcTemplate.execute(
 				"""
-						 CREATE TABLE orders (
-							 order_nr INT auto_increment PRIMARY KEY,
-							 buyer_id int NOT NULL,
-							 order_status varchar(32) NOT NULL,
-							 order_time datetime NOT NULL,
-							 payment_option varchar(32) NOT NULL,
-							 delivery_address_id INT NOT NULL,
-							 contact_number varchar(100) NULL,
-							 currency varchar(50) NULL,
-							 total_price decimal,
-							 CONSTRAINT FK_order_to_buyer FOREIGN KEY (buyer_id) REFERENCES buyer (buyer_id),
-							 CONSTRAINT FK_order_to_delivery_address FOREIGN KEY (delivery_address_id) REFERENCES buyer_address (buyer_address_id)
-						 );
+						CREATE TABLE orders (
+						 order_id INT auto_increment PRIMARY KEY,
+						 buyer_id int NOT NULL,
+						 order_status varchar(32) NOT NULL,
+						 order_time datetime NOT NULL,
+						 payment_option varchar(32) NOT NULL,
+						 delivery_address_id INT NOT NULL,
+						 contact_number varchar(100) NULL,
+						 currency varchar(50) NULL,
+						 total_price decimal,
+						 CONSTRAINT FK_order_to_buyer FOREIGN KEY (buyer_id) REFERENCES buyer (buyer_id),
+						 CONSTRAINT FK_order_to_delivery_address FOREIGN KEY (delivery_address_id) REFERENCES buyer_address (buyer_address_id)
+						);
 						""");
 
 		this.jdbcTemplate.execute("""
-				 CREATE TABLE order_item (
-					 order_item_id INT auto_increment PRIMARY KEY,
-					 order_nr int NOT NULL,
-					 item_nt smallint NOT NULL,
-					 name varchar(100) NOT NULL,
-					 quantity smallint NOT NULL,
-					 price decimal,
-					 CONSTRAINT UC_order_items UNIQUE (order_item_id, order_nr),
-					 CONSTRAINT FK_order_item_to_order FOREIGN KEY (order_nr) REFERENCES orders (order_nr)
-				 );
+				    CREATE TABLE item (
+				        item_id INT auto_increment PRIMARY KEY,
+						name VARCHAR(100) NOT NULL,
+				        price DECIMAL NOT NULL
+				    );
 				""");
+
+		this.jdbcTemplate.execute(
+				"""
+						 CREATE TABLE order_item (
+							 order_item_id INT auto_increment PRIMARY KEY,
+							 order_id int NOT NULL,
+							 item_id int NOT NULL,
+							 name varchar(100) NOT NULL,
+							 quantity smallint NOT NULL,
+							 price decimal,
+							 CONSTRAINT UC_order_items UNIQUE (order_item_id, order_id),
+							 CONSTRAINT FK_order_item_to_order FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE CASCADE
+						 );
+						""");
 	}
 
 	private void initData() {
@@ -89,18 +98,22 @@ public class DatabaseInitializer {
 				"INSERT INTO orders (buyer_id, order_status, order_time, payment_option, delivery_address_id, contact_number, currency, total_price) VALUES (1, 'WAITING_FOR_CONFIRMATION', '2026-02-08 10:00:00', 'CASH', 1, '+385123456', 'EUR', 20.00)");
 
 		this.jdbcTemplate.execute(
-				"INSERT INTO orders (buyer_id, order_status, order_time, payment_option, delivery_address_id, contact_number, currency, total_price) VALUES (1, 'PREPARING', '2026-02-08 08:00:00', 'CASH', 2, '+3859876543', 'EUR', 50.00)");
+				"INSERT INTO orders (buyer_id, order_status, order_time, payment_option, delivery_address_id, contact_number, currency, total_price) VALUES (2, 'PREPARING', '2026-02-08 08:00:00', 'CASH', 2, '+3859876543', 'EUR', 50.00)");
+
+		this.jdbcTemplate.execute("INSERT INTO item (item_id, name, price) VALUES (1, 'Fresh Salmon Fillet', 10.00)");
+		this.jdbcTemplate.execute("INSERT INTO item (item_id, name, price) VALUES (2, 'Avocado Pack', 5.00)");
+		this.jdbcTemplate.execute("INSERT INTO item (item_id, name, price) VALUES (3, 'Organic Quinoa 1kg', 10.00)");
 
 		this.jdbcTemplate.execute(
-				"INSERT INTO order_item (order_nr, item_nt, name, quantity, price) VALUES (1, 1, 'Fresh Salmon Fillet', 2, 10.00)");
+				"INSERT INTO order_item (order_id, item_id, name, quantity, price) VALUES (1, 1, 'Fresh Salmon Fillet', 2, 10.00)");
 		this.jdbcTemplate.execute(
-				"INSERT INTO order_item (order_nr, item_nt, name, quantity, price) VALUES (2, 1, 'Organic Quinoa 1kg', 1, 10.00)");
+				"INSERT INTO order_item (order_id, item_id, name, quantity, price) VALUES (2, 3, 'Organic Quinoa 1kg', 1, 10.00)");
 
 		this.jdbcTemplate.execute(
-				"INSERT INTO order_item (order_nr, item_nt, name, quantity, price) VALUES (2, 2, 'Avocado Pack', 4, 5.00)");
+				"INSERT INTO order_item (order_id, item_id, name, quantity, price) VALUES (2, 2, 'Avocado Pack', 4, 5.00)");
 
 		this.jdbcTemplate.execute(
-				"INSERT INTO order_item (order_nr, item_nt, name, quantity, price) VALUES (2, 3, 'Fresh Salmon Fillet', 2, 10.00)");
+				"INSERT INTO order_item (order_id, item_id, name, quantity, price) VALUES (2, 1, 'Fresh Salmon Fillet', 2, 10.00)");
 
 	}
 }
