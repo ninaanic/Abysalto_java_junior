@@ -8,43 +8,43 @@ import org.springframework.data.annotation.AccessType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @AccessType(AccessType.Type.PROPERTY)
+@Table(name = "orders")
 public class Order {
 	@Id
+	@Column("order_nr")
 	private Long orderNr;
+
+	@Column("buyer_id")
 	private Long buyerId;
-	//private Buyer buyer;
-	@Transient
-	private OrderStatus orderStatus;
+
+	// private Buyer buyer;
 
 	@Column("order_status")
-	public String getStringOrderStatus() {
-		return this.orderStatus.toString();
-	}
+	private OrderStatus orderStatus;
 
-	public void setStringOrderStatus(String orderStatusString) {
-		this.orderStatus = OrderStatus.fromString(orderStatusString);
-	}
-
+	@Column("order_time")
 	private LocalDateTime orderTime;
-	//	private List<OrderItem> orderItems;
-	@Transient
-	private PaymentOption paymentOption;
+
+	// private List<OrderItem> orderItems;
 
 	@Column("payment_option")
-	public String getStringPaymentOption() {
-		return this.paymentOption.toString();
-	}
+	private PaymentOption paymentOption;
 
-	public void setStringPaymentOption(String paymentOptionString) {
-		this.paymentOption = PaymentOption.fromString(paymentOptionString);
-	}
-
+	@Column("delivery_address_id")
 	private Long deliveryAddressId;
-	//	private BuyerAddress deliveryAddress;
+
+	// private BuyerAddress deliveryAddress;
+
+	@Column("contact_number")
 	private String contactNumber;
+
+	@Column("currency")
 	private String currency;
+
+	@Column("total_price")
 	private BigDecimal totalPrice;
 }
