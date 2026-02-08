@@ -38,7 +38,8 @@ public class BuyerController {
 	@GetMapping("/list")
 	public ResponseEntity list() {
 		if (!this.databaseInitializer.isDataInitialized()) {
-			return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).contentType(MediaType.TEXT_PLAIN).body("Data not initialized");
+			return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).contentType(MediaType.TEXT_PLAIN)
+					.body("Data not initialized");
 		}
 		try {
 			return ResponseEntity.ok(this.buyerManager.getAllBuyers());
@@ -53,27 +54,27 @@ public class BuyerController {
 		return "buyer/index";
 	}
 
-	@GetMapping("/addnew")
-	public String addNewEmployee(Model model) {
+	@GetMapping("/add")
+	public String addNewBuyer(Model model) {
 		Buyer buyer = new Buyer();
 		model.addAttribute("buyer", buyer);
 		return "buyer/newbuyer";
 	}
 
 	@PostMapping("/save")
-	public String sabeBuyer(@ModelAttribute("buyer") Buyer buyer) {
+	public String saveBuyer(@ModelAttribute("buyer") Buyer buyer) {
 		this.buyerManager.save(buyer);
 		return "redirect:/buyer/";
 	}
 
-	@GetMapping("/showFormForUpdate/{id}")
+	@GetMapping("/update/{id}")
 	public String updateForm(@PathVariable(value = "id") long id, Model model) {
 		Buyer buyer = this.buyerManager.getById(id);
 		model.addAttribute("buyer", buyer);
 		return "buyer/updatebuyer";
 	}
 
-	@GetMapping("/deleteBuyer/{id}")
+	@GetMapping("/delete/{id}")
 	public String deleteById(@PathVariable(value = "id") long id) {
 		this.buyerManager.deleteById(id);
 		return "redirect:/buyer/";
