@@ -8,6 +8,7 @@ This project is a technical task for Abysalto.
 
 ```bash
 git clone https://github.com/your-username/abysalto-tech-task.git
+cd Abysalto_java_junior
 
 ```
 
