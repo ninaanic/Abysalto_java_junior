@@ -2,6 +2,8 @@ package hr.abysalto.hiring.api.junior.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.Data;
 import org.springframework.data.annotation.AccessType;
@@ -15,13 +17,14 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table(name = "orders")
 public class Order {
 	@Id
-	@Column("order_nr")
-	private Long orderNr;
+	@Column("order_id")
+	private Long orderId;
 
 	@Column("buyer_id")
 	private Long buyerId;
 
-	// private Buyer buyer;
+	@Transient
+	private Buyer buyer;
 
 	@Column("order_status")
 	private OrderStatus orderStatus;
@@ -29,7 +32,8 @@ public class Order {
 	@Column("order_time")
 	private LocalDateTime orderTime;
 
-	// private List<OrderItem> orderItems;
+	@Transient
+	private List<OrderItem> orderItems = new ArrayList<>();;
 
 	@Column("payment_option")
 	private PaymentOption paymentOption;
@@ -37,7 +41,8 @@ public class Order {
 	@Column("delivery_address_id")
 	private Long deliveryAddressId;
 
-	// private BuyerAddress deliveryAddress;
+	@Transient
+	private BuyerAddress deliveryAddress;
 
 	@Column("contact_number")
 	private String contactNumber;
